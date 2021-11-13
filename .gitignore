@@ -1,0 +1,6 @@
+log
+pid
+ipc/
+dependencies
+venv/
+*.txt
