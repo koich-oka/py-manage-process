@@ -19,10 +19,6 @@ class CustomHandler(FileSystemEventHandler):
     def __init__(self, queue: Queue) -> None:
         self.queue = queue
 
-    def on_created(self, event: FileCreatedEvent):
-        LOG.info(f"file is created: {event.src_path}")
-        self.run(event.src_path)
-
     def on_modified(self, event: FileModifiedEvent):
         LOG.info(f"file is modified: {event.src_path}")
         if event.is_directory:
