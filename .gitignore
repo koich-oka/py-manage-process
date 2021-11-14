@@ -4,3 +4,4 @@ ipc/
 dependencies
 venv/
 *.txt
+*.png

@@ -13,6 +13,7 @@ from watchdog.events import (
 from watchdog.observers import Observer
 from queue import Queue
 import os
+import tracemalloc
 
 
 class CustomHandler(FileSystemEventHandler):
@@ -37,6 +38,23 @@ def save_pid():
         f.write(str(os.getpid()))
 
 
+def create_figure(output_path: str) -> None:
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, num=1, clear=True)
+    fig.savefig("plot.png", dpi=100)
+    plt.close(fig)
+
+
+def run(body: str) -> None:
+    LOG.info(f"queue body: {body}")
+    intput_path, output_path = body.split(",")
+    create_figure(output_path)
+    with open(intput_path) as f:
+        input_body = f.read()
+    with open(output_path, "w") as f:
+        f.write(input_body)
+    LOG.info(f"write to {output_path}")
+
+
 LOG = logging.getLogger(__file__)
 LOG.setLevel(logging.INFO)
 fh = logging.FileHandler("log")
@@ -57,13 +75,10 @@ if __name__ == "__main__":
         while True:
             LOG.info("wait queue")
             body = q.get()
-            LOG.info(f"queue body: {body}")
-            intput_path, output_path = body.split(",")
-            with open(intput_path) as f:
-                input_body = f.read()
-            with open(output_path, "w") as f:
-                f.write(input_body)
-            LOG.info(f"write to {output_path}")
+            tracemalloc.start()
+            run(body)
+            LOG.info(tracemalloc.get_traced_memory())
+            tracemalloc.stop()
     except:
         import traceback
 
